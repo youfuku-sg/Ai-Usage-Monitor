@@ -32,6 +32,7 @@ pub(super) const STRINGS: Strings = Strings {
     exit: "Exit",
     show_widget: "Show Widget",
     session_window: "5h",
+    claude_label: "claude:",
     now: "now",
     day_suffix: "d",
     hour_suffix: "h",

@@ -150,6 +150,7 @@ pub struct Strings {
     pub exit: &'static str,
     pub show_widget: &'static str,
     pub session_window: &'static str,
+    pub claude_label: &'static str,
     pub now: &'static str,
     pub day_suffix: &'static str,
     pub hour_suffix: &'static str,

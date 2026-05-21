@@ -32,6 +32,7 @@ pub(super) const STRINGS: Strings = Strings {
     exit: "終了",
     show_widget: "ウィジェットを表示",
     session_window: "5h",
+    claude_label: "claude:",
     now: "今",
     day_suffix: "日",
     hour_suffix: "時間",
