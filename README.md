@@ -3,10 +3,10 @@
 
 # Ai-Usage-Monitor
 
-> このリポジトリは [CodeZeno/Claude-Code-Usage-Monitor](https://github.com/CodeZeno/Claude-Code-Usage-Monitor) をフォークし、自分の用途や好みに合わせて改修したものです。オリジナルを作成・公開してくださった [Craig Constable](https://github.com/CodeZeno) に感謝します。
+## はじめに
+このリポジトリは [CodeZeno/Claude-Code-Usage-Monitor](https://github.com/CodeZeno/Claude-Code-Usage-Monitor) をフォークし、自分の用途や好みに合わせて改修したものです。オリジナルを作成・公開してくださった [Craig Constable](https://github.com/CodeZeno) に感謝します。
 
-![Screenshot](.github/animation.gif)
-
+## 概要
 Claude Code をすでに使っている人向けの、軽量な Windows タスクバーウィジェット。Codex の使用量表示にも対応。
 
 ターミナルやプロバイダーのサイトを開かなくても、Claude Code や Codex の残り使用量をタスクバーで確認できます。
@@ -14,7 +14,6 @@ Claude Code をすでに使っている人向けの、軽量な Windows タス�
 ## 機能
 
 - 現在の 5 時間ウィンドウを示す **5h** バー
-- 現在の 7 日間ウィンドウを示す **7d** バー
 - Claude Code と並べて表示できるオプションの Codex 使用量バー
 - 各上限のリセットまでのカウントダウン
 - Windows タスクバーに直接表示されるネイティブウィジェット
