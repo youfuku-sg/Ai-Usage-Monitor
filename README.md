@@ -167,3 +167,11 @@ claude-code-usage-monitor --diagnose
 このプロジェクトは MIT ライセンスで公開されています。
 
 動作を確認したい場合やコードを監査したい場合は、すべてこのリポジトリにあります。
+
+## このリポジトリについて
+
+このリポジトリは [CodeZeno/Claude-Code-Usage-Monitor](https://github.com/CodeZeno/Claude-Code-Usage-Monitor) をフォークしたものです。
+
+オリジナルを作成・公開してくださった [Craig Constable](https://github.com/CodeZeno) に感謝します。
+
+オリジナルをベースに、自分の用途や好みに合わせて機能追加・改修を加えたものがこのリポジトリです。
