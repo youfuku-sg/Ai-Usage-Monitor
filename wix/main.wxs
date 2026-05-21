@@ -17,7 +17,6 @@
             InstallerVersion='450'
             Languages='1033'
             Compressed='yes'
-            InstallScope='perUser'
             SummaryCodepage='1252'/>
 
         <MajorUpgrade
@@ -27,24 +26,14 @@
         <Media Id='1' Cabinet='main.cab' EmbedCab='yes'/>
 
         <Directory Id='TARGETDIR' Name='SourceDir'>
-            <Directory Id='LocalAppDataFolder'>
+            <Directory Id='ProgramFiles64Folder'>
                 <Directory Id='APPLICATIONFOLDER' Name='AiUsageMonitor'>
-                    <Component Id='binary0' Guid='AA90DAF9-E342-40FD-80A6-3AAFBFD77769'>
+                    <Component Id='binary0' Guid='*'>
                         <File
                             Id='exe0'
                             Name='ai-usage-monitor.exe'
                             DiskId='1'
-                            Source='target\release\claude-code-usage-monitor.exe'/>
-                        <RemoveFolder
-                            Id='RemoveApplicationFolder'
-                            Directory='APPLICATIONFOLDER'
-                            On='uninstall'/>
-                        <RegistryValue
-                            Root='HKCU'
-                            Key='Software\youfuku-sg\AiUsageMonitor'
-                            Name='path'
-                            Type='string'
-                            Value='[APPLICATIONFOLDER]'
+                            Source='target\release\claude-code-usage-monitor.exe'
                             KeyPath='yes'/>
                     </Component>
                 </Directory>

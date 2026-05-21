@@ -523,7 +523,7 @@ fn version_action_label(
         UpdateStatus::Applying => format!("v{current} - {}", strings.applying_update),
         UpdateStatus::UpToDate => format!("v{current} - {}", strings.up_to_date_short),
         UpdateStatus::Available(release) => match install_channel {
-            InstallChannel::Portable => {
+            InstallChannel::Portable | InstallChannel::Msi => {
                 format!(
                     "v{current} - {} v{}",
                     strings.update_to, release.latest_version
@@ -596,6 +596,7 @@ fn begin_update_check(hwnd: HWND, interactive: bool) {
                 if interactive && show_update_prompt(hwnd, strings, &release) {
                     match install_channel {
                         InstallChannel::Portable => begin_update_apply(hwnd, release),
+                        InstallChannel::Msi => begin_msi_update_apply(hwnd, release),
                         InstallChannel::Winget => begin_winget_update(hwnd),
                     }
                 }
@@ -666,6 +667,24 @@ fn begin_update_apply(hwnd: HWND, release: ReleaseDescriptor) {
                 unsafe {
                     let _ = PostMessageW(hwnd, WM_APP_UPDATE_CHECK_COMPLETE, WPARAM(0), LPARAM(0));
                 }
+            }
+        }
+    });
+}
+
+fn begin_msi_update_apply(hwnd: HWND, release: ReleaseDescriptor) {
+    let strings = {
+        let state = lock_state();
+        state.as_ref().map(|s| s.language.strings())
+    }
+    .unwrap_or(LanguageId::English.strings());
+
+    std::thread::spawn(move || {
+        match updater::begin_msi_update(&release) {
+            Ok(()) => {}
+            Err(error) => {
+                let message = format!("{}.\n\n{}", strings.update_failed, error);
+                show_error_message(hwnd, strings.updates, &message);
             }
         }
     });
@@ -2164,6 +2183,13 @@ unsafe extern "system" fn wnd_proc(
                         InstallChannel::Winget => {
                             if release.is_some() {
                                 begin_winget_update(hwnd);
+                            } else {
+                                begin_update_check(hwnd, true);
+                            }
+                        }
+                        InstallChannel::Msi => {
+                            if let Some(release) = release {
+                                begin_msi_update_apply(hwnd, release);
                             } else {
                                 begin_update_check(hwnd, true);
                             }

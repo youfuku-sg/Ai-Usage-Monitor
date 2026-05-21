@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.0.6] - 2026-05-21
+
+### Changed
+- MSI インストーラーを per-machine（全ユーザー）インストールに変更（インストール先: `%ProgramFiles%\AiUsageMonitor\`）
+- 「アプリと機能」への表示に対応
+- MSI インストール版の自動更新を UAC 経由の MSI 再実行方式に変更
+
 ## [0.0.5] - 2026-05-21
 
 ### Fixed
