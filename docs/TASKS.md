@@ -2,6 +2,11 @@
 
 改修内容の着手順・リストを管理する。各変更の詳細仕様は openspec を参照。
 
+
+remove-7d-status → claude-single-line → add-service-label → show-reset-time → add-codex-line
+
+
+
 ---
 
 ## 進行中
