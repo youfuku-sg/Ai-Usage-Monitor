@@ -9,7 +9,6 @@ pub struct UsageSection {
 #[derive(Clone, Debug, Default)]
 pub struct UsageData {
     pub session: UsageSection,
-    pub weekly: UsageSection,
 }
 
 #[derive(Clone, Debug, Default)]

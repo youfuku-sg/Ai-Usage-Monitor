@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.0.8] - 2026-05-21
+
+### Changed
+- ウィジェットとツールチップから 7d（7日間ウィンドウ）の表示を削除し、5h のみを表示するよう変更
+
 ## [0.0.7] - 2026-05-21
 
 ### Fixed
