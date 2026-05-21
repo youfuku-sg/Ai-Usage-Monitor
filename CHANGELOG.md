@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.1.1] - 2026-05-21
+
+### Changed
+- タスクトレイのアイコンをモデル数に関わらず常に1つ（アプリロゴ）に統一
+- ツールチップに有効な全モデルの使用率をまとめて表示
+
 ## [0.1.0] - 2026-05-21
 
 ### Fixed

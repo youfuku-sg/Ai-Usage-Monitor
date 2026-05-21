@@ -283,49 +283,36 @@ fn save_state_settings() {
 fn tray_icon_data_from_state() -> Vec<tray_icon::TrayIconData> {
     let state = lock_state();
     match state.as_ref() {
-        Some(s) if s.last_poll_ok => {
-            let mut icons = Vec::new();
-            if s.show_claude_code {
-                icons.push(tray_icon::TrayIconData {
-                    kind: tray_icon::TrayIconKind::Claude,
-                    percent: Some(s.session_percent),
-                    tooltip: format!(
+        Some(s) => {
+            let tooltip = if s.last_poll_ok {
+                let mut parts = Vec::new();
+                if s.show_claude_code {
+                    parts.push(format!(
                         "{} 5h: {}",
                         s.language.strings().claude_code_model,
                         s.session_text
-                    ),
-                });
-            }
-            if s.show_codex {
-                icons.push(tray_icon::TrayIconData {
-                    kind: tray_icon::TrayIconKind::Codex,
-                    percent: Some(s.codex_session_percent),
-                    tooltip: format!(
+                    ));
+                }
+                if s.show_codex {
+                    parts.push(format!(
                         "{} 5h: {}",
                         s.language.strings().codex_model,
                         s.codex_session_text
-                    ),
-                });
-            }
-            icons
-        }
-        Some(s) => {
-            let mut icons = Vec::new();
-            if s.show_claude_code {
-                icons.push(tray_icon::TrayIconData {
-                    kind: tray_icon::TrayIconKind::Claude,
-                    percent: None,
-                    tooltip: s.language.strings().window_title.to_string(),
-                });
-            }
-            if s.show_codex {
-                icons.push(tray_icon::TrayIconData {
-                    kind: tray_icon::TrayIconKind::Codex,
-                    percent: None,
-                    tooltip: s.language.strings().codex_window_title.to_string(),
-                });
-            }
-            icons
+                    ));
+                }
+                if parts.is_empty() {
+                    s.language.strings().window_title.to_string()
+                } else {
+                    parts.join(" | ")
+                }
+            } else {
+                s.language.strings().window_title.to_string()
+            };
+            vec![tray_icon::TrayIconData {
+                kind: tray_icon::TrayIconKind::Claude,
+                percent: None,
+                tooltip,
+            }]
         }
         None => Vec::new(),
     }
@@ -1547,7 +1534,7 @@ fn do_poll(send_hwnd: SendHwnd) {
                         } else {
                             (
                                 s.language.strings(),
-                                tray_icon::TrayIconKind::Codex,
+                                tray_icon::TrayIconKind::Claude,
                                 s.language.strings().codex_token_expired_title,
                                 s.language.strings().codex_token_expired_body,
                             )
