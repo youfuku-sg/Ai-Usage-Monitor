@@ -34,17 +34,7 @@
                             Id='exe0'
                             Name='ai-usage-monitor.exe'
                             DiskId='1'
-                            Source='target\release\claude-code-usage-monitor.exe'/>
-                        <RemoveFolder
-                            Id='RemoveApplicationFolder'
-                            Directory='APPLICATIONFOLDER'
-                            On='uninstall'/>
-                        <RegistryValue
-                            Root='HKCU'
-                            Key='Software\youfuku-sg\AiUsageMonitor'
-                            Name='path'
-                            Type='string'
-                            Value='[APPLICATIONFOLDER]'
+                            Source='target\release\claude-code-usage-monitor.exe'
                             KeyPath='yes'/>
                     </Component>
                 </Directory>
