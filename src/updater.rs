@@ -16,6 +16,7 @@ const GITHUB_API_VERSION: &str = "2022-11-28";
 const RELEASE_ASSET_NAME: &str = "claude-code-usage-monitor.exe";
 const HELPER_EXE_NAME: &str = "updater-helper.exe";
 const DOWNLOAD_EXE_NAME: &str = "update-download.exe";
+const DOWNLOAD_MSI_NAME: &str = "update-download.msi";
 const CREATE_NO_WINDOW: u32 = 0x08000000;
 const CREATE_NEW_CONSOLE: u32 = 0x00000010;
 // Keep this aligned with the package identifier used in winget-pkgs.
@@ -25,12 +26,14 @@ const WINGET_PACKAGE_ID: &str = "CodeZeno.ClaudeCodeUsageMonitor";
 pub enum InstallChannel {
     Portable,
     Winget,
+    Msi,
 }
 
 #[derive(Clone, Debug)]
 pub struct ReleaseDescriptor {
     pub latest_version: String,
     asset_url: String,
+    msi_asset_url: Option<String>,
 }
 
 #[derive(Debug)]
@@ -72,6 +75,7 @@ pub fn handle_cli_mode(args: &[String]) -> Option<i32> {
 pub fn current_install_channel() -> InstallChannel {
     match std::env::current_exe() {
         Ok(path) if is_winget_install_path(&path) => InstallChannel::Winget,
+        Ok(path) if is_msi_install_path(&path) => InstallChannel::Msi,
         _ => InstallChannel::Portable,
     }
 }
@@ -102,6 +106,38 @@ pub fn begin_winget_update() -> Result<(), String> {
         .creation_flags(CREATE_NEW_CONSOLE)
         .spawn()
         .map_err(|e| format!("Unable to launch WinGet update command: {e}"))?;
+
+    Ok(())
+}
+
+pub fn begin_msi_update(release: &ReleaseDescriptor) -> Result<(), String> {
+    let msi_url = release
+        .msi_asset_url
+        .as_ref()
+        .ok_or_else(|| "No MSI installer found in this release.".to_string())?;
+
+    let stage_dir = updates_dir()?;
+    std::fs::create_dir_all(&stage_dir)
+        .map_err(|e| format!("Unable to create updater working directory: {e}"))?;
+
+    let download_path = stage_dir.join(DOWNLOAD_MSI_NAME);
+    let partial_path = stage_dir.join(format!("{DOWNLOAD_MSI_NAME}.part"));
+
+    if download_path.exists() {
+        let _ = std::fs::remove_file(&download_path);
+    }
+    if partial_path.exists() {
+        let _ = std::fs::remove_file(&partial_path);
+    }
+
+    download_release_asset(msi_url, &partial_path, &download_path)?;
+
+    Command::new("msiexec.exe")
+        .arg("/i")
+        .arg(&download_path)
+        .creation_flags(CREATE_NEW_CONSOLE)
+        .spawn()
+        .map_err(|e| format!("Unable to launch MSI installer: {e}"))?;
 
     Ok(())
 }
@@ -204,9 +240,16 @@ fn fetch_latest_release() -> Result<Option<ReleaseDescriptor>, String> {
             "No Windows executable asset was found in the latest release.".to_string()
         })?;
 
+    let msi_asset_url = release
+        .assets
+        .iter()
+        .find(|a| a.name.to_ascii_lowercase().ends_with(".msi"))
+        .map(|a| a.browser_download_url.clone());
+
     Ok(Some(ReleaseDescriptor {
         latest_version,
         asset_url: asset.browser_download_url.clone(),
+        msi_asset_url,
     }))
 }
 
@@ -422,6 +465,27 @@ fn github_repo() -> Result<(&'static str, &'static str), String> {
 
 fn user_agent() -> &'static str {
     concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"))
+}
+
+fn is_msi_install_path(path: &Path) -> bool {
+    let normalized = normalize_path(path);
+    msi_install_roots()
+        .into_iter()
+        .map(|root| normalize_path(&root))
+        .any(|root| normalized.starts_with(&root))
+}
+
+fn msi_install_roots() -> Vec<PathBuf> {
+    let mut roots = Vec::new();
+    if let Ok(pf) = std::env::var("ProgramFiles") {
+        roots.push(PathBuf::from(pf).join("AiUsageMonitor"));
+    } else {
+        roots.push(PathBuf::from(r"C:\Program Files\AiUsageMonitor"));
+    }
+    if let Ok(pf86) = std::env::var("ProgramFiles(x86)") {
+        roots.push(PathBuf::from(pf86).join("AiUsageMonitor"));
+    }
+    roots
 }
 
 fn is_winget_install_path(path: &Path) -> bool {
