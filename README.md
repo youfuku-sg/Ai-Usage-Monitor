@@ -1,169 +1,170 @@
 ![Windows](https://img.shields.io/badge/platform-Windows-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Claude Code Usage Monitor
+# Ai-Usage-Monitor
 
-![Screenshot](.github/animation.gif)
+## はじめに
+このリポジトリは [CodeZeno/Claude-Code-Usage-Monitor](https://github.com/CodeZeno/Claude-Code-Usage-Monitor) をフォークし、自分の用途や好みに合わせて改修したものです。オリジナルを作成・公開してくださった [Craig Constable](https://github.com/CodeZeno) に感謝します。
 
-A lightweight Windows taskbar widget for people already using Claude Code, with optional Codex usage display.
+## 概要
+Claude Code をすでに使っている人向けの、軽量な Windows タスクバーウィジェット。Codex の使用量表示にも対応。
 
-It sits in your taskbar and shows how much of your Claude Code and/or Codex usage window you have left, without needing to open the terminal or the provider site.
+ターミナルやプロバイダーのサイトを開かなくても、Claude Code や Codex の残り使用量をタスクバーで確認できます。
 
-## What You Get
+## 機能
 
-- A **5h** bar for your current 5-hour Claude usage window
-- A **7d** bar for your current 7-day window
-- Optional Codex usage bars alongside Claude Code
-- A live countdown until each limit resets
-- A small native widget that lives directly in the Windows taskbar
-- System tray icon badges showing your enabled model usage percentage
-- Left-click the tray icon to toggle the taskbar widget on or off
-- Right-click options for refresh, displayed models, update frequency, language, startup, and updates
+- 現在の 5 時間ウィンドウを示す **5h** バー
+- Claude Code と並べて表示できるオプションの Codex 使用量バー
+- 各上限のリセットまでのカウントダウン
+- Windows タスクバーに直接表示されるネイティブウィジェット
+- 有効なモデルの使用率をパーセンテージで示すシステムトレイアイコンバッジ
+- トレイアイコン左クリックでタスクバーウィジェットの表示/非表示を切り替え
+- 右クリックメニューで更新・表示モデル・更新頻度・言語・スタートアップ・アップデートを操作
 
-## Who This Is For
+## 対象ユーザー
 
-This app is for Windows users who already have **Claude Code (CLI or App) installed and signed in**.
+**Claude Code（CLI またはアプリ）をインストール済みでサインイン済みの Windows ユーザー**向けのアプリです。
 
-Codex support is optional. To show Codex usage, install and sign in to the Codex CLI, then enable Codex from the right-click **Models** menu.
+Codex 対応はオプションです。Codex の使用量を表示するには、Codex CLI をインストールしてサインインし、右クリックの **Models** メニューから Codex を有効にしてください。
 
-It works best if you want a simple "how close am I to the limit?" display that is always visible.
+「上限までどのくらいか」を常に表示しておきたい方に最適です。
 
-## Requirements
+## 動作環境
 
-- Windows 10 or Windows 11
-- Claude Code (CLI or App) installed and authenticated
-- Optional: Codex CLI installed and authenticated, if you want Codex usage
+- Windows 10 または Windows 11
+- Claude Code（CLI またはアプリ）インストール済み・認証済み
+- オプション：Codex の使用量を表示する場合は Codex CLI のインストールと認証が必要
 
-If you use Claude Code through WSL, that is supported too. The monitor can read your Claude Code credentials from Windows or from your WSL environment.
+WSL 経由で Claude Code を使用している場合も対応しています。Windows または WSL 環境の Claude Code 認証情報を読み取れます。
 
-## Install
+## インストール
 
-Install the latest version from WinGet:
+WinGet で最新バージョンをインストールします：
 
 ```powershell
 winget install CodeZeno.ClaudeCodeUsageMonitor
 ```
 
-If you prefer not to use WinGet, you can still download the latest `claude-code-usage-monitor.exe` from the [Releases](https://github.com/CodeZeno/Claude-Code-Usage-Monitor/releases) page and run it directly.
+WinGet を使わない場合は、[Releases](https://github.com/CodeZeno/Claude-Code-Usage-Monitor/releases) ページから最新の `ai-usage-monitor.exe` をダウンロードして直接実行することもできます。
 
-## Use
+## 使い方
 
-After installing with WinGet, run:
-
-```powershell
-claude-code-usage-monitor
-```
-
-Once running, it will appear in your taskbar and as one or more tray icons in the notification area.
-
-- Drag the left divider to move the taskbar widget
-- Right-click the taskbar widget or tray icon for refresh, displayed models, update frequency, Start with Windows, reset position, language, updates, and exit
-- Left-click the tray icon to toggle the taskbar widget on or off
-- Enable `Start with Windows` from the right-click menu if you want it to launch automatically when you sign in
-
-### Models
-
-Use the right-click **Models** menu to choose what the widget displays:
-
-- **Claude Code** is enabled by default
-- **Codex** can be enabled alongside Claude Code or shown by itself
-
-When both models are shown, each model has its own usage bar and matching usage text color.
-
-### System Tray Icon
-
-The tray icon shows your current 5-hour usage as a percentage badge.
-
-If both Claude Code and Codex are enabled, the app shows two tray icons: one for Claude Code and one for Codex. If only one model is enabled, it shows one tray icon.
-
-The Claude Code tray icon uses the same warm usage colors as the Claude bar. The Codex tray icon uses a black and white badge style.
-
-Hovering over a tray icon shows the usage values for that model.
-
-## Diagnostics
-
-If you need to troubleshoot startup or visibility issues, run:
+WinGet でインストールした後、以下のコマンドで起動します：
 
 ```powershell
-claude-code-usage-monitor --diagnose
+ai-usage-monitor
 ```
 
-This writes a log file to:
+起動するとタスクバーとシステムトレイに表示されます。
+
+- 左のディバイダーをドラッグしてウィジェットを移動
+- タスクバーウィジェットまたはトレイアイコンを右クリックで、更新・表示モデル・更新頻度・スタートアップ・位置リセット・言語・アップデート・終了を操作
+- トレイアイコンを左クリックしてウィジェットの表示/非表示を切り替え
+- サインイン時に自動起動させる場合は右クリックメニューから `Start with Windows` を有効化
+
+### モデル
+
+右クリックの **Models** メニューでウィジェットに表示する内容を選択できます：
+
+- **Claude Code** はデフォルトで有効
+- **Codex** は Claude Code と並べて表示するか、単独で表示するかを選択できます
+
+両方のモデルを表示している場合、それぞれのモデルに専用の使用量バーと使用量テキストカラーが割り当てられます。
+
+### システムトレイアイコン
+
+トレイアイコンには現在の 5 時間使用率がパーセンテージバッジとして表示されます。
+
+Claude Code と Codex の両方が有効な場合、Claude Code 用と Codex 用の 2 つのトレイアイコンが表示されます。どちらか一方のみ有効な場合は 1 つだけ表示されます。
+
+Claude Code のトレイアイコンは Claude バーと同じウォームカラーを使用します。Codex のトレイアイコンは白黒のバッジスタイルです。
+
+トレイアイコンにマウスを重ねると、そのモデルの使用量が表示されます。
+
+## 診断
+
+起動や表示の問題をトラブルシュートする場合は以下を実行します：
+
+```powershell
+ai-usage-monitor --diagnose
+```
+
+ログファイルは以下に書き込まれます：
 
 ```text
-%TEMP%\claude-code-usage-monitor.log
+%TEMP%\ai-usage-monitor.log
 ```
 
-Settings are saved to:
+設定は以下に保存されます：
 
 ```text
 %APPDATA%\ClaudeCodeUsageMonitor\settings.json
 ```
 
-## Account Support
+## アカウント対応
 
-This app works with the same account types that Claude Code itself supports.
+このアプリは Claude Code 自体がサポートするものと同じアカウントタイプに対応しています。
 
-As of **March 19, 2026**, Anthropic's Claude Code setup documentation says:
+**2026 年 3 月 19 日時点**で、Anthropic の Claude Code セットアップドキュメントには以下の記載があります：
 
-- **Supported:** Pro, Max, Teams, Enterprise, and Console accounts
-- **Not supported:** the free Claude.ai plan
+- **対応：** Pro・Max・Teams・Enterprise・Console アカウント
+- **非対応：** 無料の Claude.ai プラン
 
-If Anthropic changes Claude Code availability in the future, this app should follow whatever Claude Code supports, as long as the usage data remains exposed through the same authenticated endpoints.
+将来 Anthropic が Claude Code の対応範囲を変更した場合、使用量データが同じ認証済みエンドポイントを通じて提供される限り、このアプリも追随する予定です。
 
-## Privacy And Security
+## プライバシーとセキュリティ
 
-This project is **open source**, so you can inspect exactly what it does.
+このプロジェクトは**オープンソース**であるため、動作内容を正確に確認できます。
 
-What the app reads:
+アプリが読み取る情報：
 
-- Your local Claude Code OAuth credentials from `~/.claude/.credentials.json`
-- If needed, the same credentials file inside an installed WSL distro
-- If Codex is enabled, your local Codex credentials from `$CODEX_HOME/auth.json` or `~/.codex/auth.json`
+- `~/.claude/.credentials.json` のローカル Claude Code OAuth 認証情報
+- 必要に応じてインストール済み WSL ディストリビューション内の同等ファイル
+- Codex が有効な場合、`$CODEX_HOME/auth.json` または `~/.codex/auth.json` のローカル Codex 認証情報
 
-What the app sends over the network:
+アプリがネットワーク経由で送信する情報：
 
-- Requests to Anthropic's Claude endpoints to read your usage and rate-limit information
-- Requests to ChatGPT's Codex usage endpoint to read your Codex usage and rate-limit information, if Codex is enabled
-- Requests to GitHub only if you use the app's update check / self-update feature
-- If proxy environment variables such as `HTTPS_PROXY`, `HTTP_PROXY`, or `ALL_PROXY` are set, those outbound requests may use that proxy
+- 使用量とレート制限情報を読み取るための Anthropic の Claude エンドポイントへのリクエスト
+- Codex が有効な場合、Codex の使用量とレート制限情報を読み取るための ChatGPT の Codex 使用量エンドポイントへのリクエスト
+- アップデート確認・自動更新機能を使用する場合のみ GitHub へのリクエスト
+- `HTTPS_PROXY`・`HTTP_PROXY`・`ALL_PROXY` などのプロキシ環境変数が設定されている場合、送信リクエストはそのプロキシを経由する場合があります
 
-What the app stores locally:
+アプリがローカルに保存する情報：
 
-- Widget position
-- Polling frequency
-- Language preference
-- Last update check time
-- Displayed model preferences
+- ウィジェット位置
+- ポーリング頻度
+- 言語設定
+- 最終アップデート確認時刻
+- 表示モデルの設定
 
-What it does **not** do:
+アプリが**行わないこと**：
 
-- It does not send your credentials to any other server
-- It does not use a separate backend service
-- It does not collect analytics or telemetry
-- It does not upload your project files
-- It does not directly edit your Codex credentials file
+- 認証情報を他のサーバーに送信しない
+- 独自のバックエンドサービスを使用しない
+- 分析やテレメトリを収集しない
+- プロジェクトファイルをアップロードしない
+- Codex 認証情報ファイルを直接編集しない
 
-Notes:
+注意事項：
 
-- If your Claude Code token is expired, the app may ask the local Claude CLI to refresh it in the background
-- If your Codex token is expired, the app may ask the local Codex CLI to refresh it in the background. The monitor does not write `auth.json` itself; any credential update is handled by the Codex CLI.
-- Portable installs can update themselves by downloading the latest release from this repository
-- Proxies should be trusted because proxied usage requests include your OAuth bearer token inside the TLS connection
+- Claude Code のトークンが期限切れの場合、アプリはバックグラウンドでローカルの Claude CLI にトークンのリフレッシュを要求することがあります
+- Codex のトークンが期限切れの場合、アプリはバックグラウンドでローカルの Codex CLI にトークンのリフレッシュを要求することがあります。モニター自体が `auth.json` を書き込むことはなく、認証情報の更新は Codex CLI が行います
+- ポータブルインストールはこのリポジトリの最新リリースをダウンロードして自己更新できます
+- プロキシを使用する場合は信頼できるプロキシを設定してください。プロキシ経由の使用量リクエストには TLS 接続内に OAuth ベアラートークンが含まれます
 
-## How It Works
+## 仕組み
 
-The monitor:
+モニターの動作：
 
-1. Finds your enabled model login credentials
-2. Reads your current usage from Anthropic and/or ChatGPT
-3. Shows the result directly in the Windows taskbar
-4. Refreshes periodically in the background
+1. 有効なモデルのログイン認証情報を検索
+2. Anthropic や ChatGPT から現在の使用量を読み取る
+3. 結果を Windows タスクバーに直接表示
+4. バックグラウンドで定期的に更新
 
-If the newer usage endpoint is unavailable, it can fall back to reading the rate-limit headers returned by Claude's Messages API.
+新しい使用量エンドポイントが利用できない場合、Claude の Messages API から返されるレート制限ヘッダーを読み取るフォールバック動作があります。
 
-## Open Source
+## オープンソース
 
-This project is licensed under MIT.
+このプロジェクトは MIT ライセンスで公開されています。
 
-If you want to inspect the behavior or audit the code, everything is in this repository.
+動作を確認したい場合やコードを監査したい場合は、すべてこのリポジトリにあります。
