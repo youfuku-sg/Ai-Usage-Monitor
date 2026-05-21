@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.0.4] - 2026-05-21
+
+### Fixed
+- MSI ビルドエラーを修正（WiX ICE38/ICE64: perUser + LOCALAPPDATA インストール時の KeyPath をレジストリキーに変更）
+
 ## [0.0.3] - 2026-05-21
 
 ### Added
