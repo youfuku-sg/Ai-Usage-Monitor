@@ -16,7 +16,7 @@
 | # | change名 | 内容 | openspec |
 |---|---------|------|----------|
 | 1 | `sync-github` | Gitea/GitHub CI・同期・リリースワークフロー整備 | [sync-github](../openspec/changes/sync-github/) |
-| 2 | `update-readme` | README を AiPulseHub 向けに日本語で全面書き直し | [update-readme](../openspec/changes/update-readme/) |
+| 2 | `update-readme` | README を Ai-Usage-Monitor 向けに日本語で全面書き直し | [update-readme](../openspec/changes/update-readme/) |
 
 ---
 
