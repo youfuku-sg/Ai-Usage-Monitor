@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.0.3] - 2026-05-21
+
+### Added
+- MSI インストーラーを追加（`%LOCALAPPDATA%` インストール、スタートメニューショートカット付き）
+- GitHub Actions でポータブル exe と MSI の両方をビルドして Releases に添付
+
 ## [0.0.2] - 2026-05-21
 
 ### Changed

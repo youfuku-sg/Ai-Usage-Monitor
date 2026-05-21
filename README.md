@@ -39,7 +39,13 @@ WSL 経由で Claude Code を使用している場合も対応しています。
 
 ## インストール
 
-[Releases](https://github.com/youfuku-sg/Ai-Usage-Monitor/releases) ページから最新の `ai-usage-monitor.exe` をダウンロードして直接実行します。
+**インストーラー版（推奨）**
+
+[Releases](https://github.com/youfuku-sg/Ai-Usage-Monitor/releases) ページから最新の `ai-usage-monitor-{version}.msi` をダウンロードして実行します。スタートメニューへのショートカット登録と「アプリと機能」からのアンインストールに対応しています。
+
+**ポータブル版**
+
+`ai-usage-monitor.exe` をダウンロードして任意の場所に配置し、直接実行します。
 
 ## 使い方
 
