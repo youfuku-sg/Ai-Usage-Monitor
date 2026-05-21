@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.1.4] - 2026-05-21
+
+### Fixed
+- タイムゾーン定数のコンパイルエラーを修正（`TIME_ZONE_ID_STANDARD` / `TIME_ZONE_ID_DAYLIGHT` を数値定数に置き換え）
+
 ## [0.1.3] - 2026-05-21
 
 ### Changed

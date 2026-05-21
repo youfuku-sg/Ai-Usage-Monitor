@@ -1029,16 +1029,13 @@ fn format_reset_hhmm(resets_at: Option<SystemTime>) -> String {
 }
 
 fn utc_offset_secs() -> i64 {
-    use windows::Win32::System::Time::{
-        GetTimeZoneInformation, TIME_ZONE_ID_DAYLIGHT, TIME_ZONE_ID_STANDARD,
-        TIME_ZONE_INFORMATION,
-    };
+    use windows::Win32::System::Time::{GetTimeZoneInformation, TIME_ZONE_INFORMATION};
     unsafe {
         let mut tz = TIME_ZONE_INFORMATION::default();
         let id = GetTimeZoneInformation(&mut tz);
         let extra = match id {
-            TIME_ZONE_ID_STANDARD => tz.StandardBias,
-            TIME_ZONE_ID_DAYLIGHT => tz.DaylightBias,
+            1 => tz.StandardBias, // TIME_ZONE_ID_STANDARD
+            2 => tz.DaylightBias, // TIME_ZONE_ID_DAYLIGHT
             _ => 0,
         };
         -((tz.Bias + extra) as i64) * 60
