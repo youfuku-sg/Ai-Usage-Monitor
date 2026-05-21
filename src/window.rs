@@ -673,6 +673,7 @@ fn begin_update_apply(hwnd: HWND, release: ReleaseDescriptor) {
 }
 
 fn begin_msi_update_apply(hwnd: HWND, release: ReleaseDescriptor) {
+    let send_hwnd = SendHwnd::from_hwnd(hwnd);
     let strings = {
         let state = lock_state();
         state.as_ref().map(|s| s.language.strings())
@@ -680,6 +681,7 @@ fn begin_msi_update_apply(hwnd: HWND, release: ReleaseDescriptor) {
     .unwrap_or(LanguageId::English.strings());
 
     std::thread::spawn(move || {
+        let hwnd = send_hwnd.to_hwnd();
         match updater::begin_msi_update(&release) {
             Ok(()) => {}
             Err(error) => {
