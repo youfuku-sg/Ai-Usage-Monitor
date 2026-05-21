@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.0.9] - 2026-05-21
+
+### Fixed
+- v0.0.8 で削除しきれなかった `weekly_text` / `weekly_percent` 等の残存参照をすべて削除（コンパイルエラー修正）
+
 ## [0.0.8] - 2026-05-21
 
 ### Changed

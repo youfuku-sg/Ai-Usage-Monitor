@@ -1517,9 +1517,7 @@ fn do_poll(send_hwnd: SendHwnd) {
                             s.auth_watch_mode = poller::CredentialWatchMode::ActiveSource;
                             s.auth_watch_snapshot.clear();
                             s.session_text = "...".to_string();
-                            s.weekly_text = "...".to_string();
                             s.codex_session_text = "...".to_string();
-                            s.codex_weekly_text = "...".to_string();
                             s.retry_count = s.retry_count.saturating_add(1);
                             let backoff = RETRY_BASE_MS.saturating_mul(
                                 1u32.checked_shl(s.retry_count - 1).unwrap_or(u32::MAX),
@@ -1600,15 +1598,9 @@ fn schedule_countdown_timer() {
         data.claude_code
             .as_ref()
             .and_then(|usage| poller::time_until_display_change(usage.session.resets_at)),
-        data.claude_code
-            .as_ref()
-            .and_then(|usage| poller::time_until_display_change(usage.weekly.resets_at)),
         data.codex
             .as_ref()
             .and_then(|usage| poller::time_until_display_change(usage.session.resets_at)),
-        data.codex
-            .as_ref()
-            .and_then(|usage| poller::time_until_display_change(usage.weekly.resets_at)),
     ];
     let min_delay = delays.into_iter().flatten().min();
 
@@ -2100,9 +2092,7 @@ unsafe extern "system" fn wnd_proc(
                         let mut state = lock_state();
                         if let Some(s) = state.as_mut() {
                             s.session_text = "...".to_string();
-                            s.weekly_text = "...".to_string();
                             s.codex_session_text = "...".to_string();
-                            s.codex_weekly_text = "...".to_string();
                             s.force_notify_auth_error = true;
                         }
                     }
@@ -2210,9 +2200,7 @@ unsafe extern "system" fn wnd_proc(
                                 _ => {}
                             }
                             s.session_text = "...".to_string();
-                            s.weekly_text = "...".to_string();
                             s.codex_session_text = "...".to_string();
-                            s.codex_weekly_text = "...".to_string();
                         }
                     }
                     save_state_settings();
@@ -2543,12 +2531,8 @@ fn paint(hdc: HDC, hwnd: HWND) {
         strings,
         session_pct,
         session_text,
-        weekly_pct,
-        weekly_text,
         codex_session_pct,
         codex_session_text,
-        codex_weekly_pct,
-        codex_weekly_text,
         show_claude_code,
         show_codex,
     ) = {
@@ -2559,12 +2543,8 @@ fn paint(hdc: HDC, hwnd: HWND) {
                 s.language.strings(),
                 s.session_percent,
                 s.session_text.clone(),
-                s.weekly_percent,
-                s.weekly_text.clone(),
                 s.codex_session_percent,
                 s.codex_session_text.clone(),
-                s.codex_weekly_percent,
-                s.codex_weekly_text.clone(),
                 s.show_claude_code,
                 s.show_codex,
             ),
