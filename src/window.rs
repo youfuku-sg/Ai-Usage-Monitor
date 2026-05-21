@@ -366,7 +366,7 @@ fn now_unix_secs() -> u64 {
 }
 
 fn update_check_interval() -> Duration {
-    Duration::from_secs(24 * 60 * 60)
+    Duration::from_secs(60 * 60)
 }
 
 fn auto_update_check_due(last_update_check_unix: Option<u64>) -> bool {
