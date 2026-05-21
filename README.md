@@ -1,169 +1,98 @@
 ![Windows](https://img.shields.io/badge/platform-Windows-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Claude Code Usage Monitor
+# AiPulseHub
 
-![Screenshot](.github/animation.gif)
+Claude Code の使用量をバックグラウンドで収集し、REST API・トースト通知・タスクバーウィジェットで提供するローカルハブ。
 
-A lightweight Windows taskbar widget for people already using Claude Code, with optional Codex usage display.
+## 機能
 
-It sits in your taskbar and shows how much of your Claude Code and/or Codex usage window you have left, without needing to open the terminal or the provider site.
+- **タスクバーウィジェット** — Claude の 5 時間ウィンドウ使用率と次回リセット時刻を 1 行で常時表示
+- **タスクトレイアイコン** — 使用率バッジをアイコンに重ねて表示。右クリックでメニューを開ける
+- **REST API** — `GET /status` `GET /status/claude` `GET /health` をポート 8765 で提供
+- **トースト通知** — 使用率が 80 / 90 / 95 / 98% に達した時点でデスクトップ通知を表示
+- **自動アップデート** — Gitea を優先し、GitHub をフォールバックとして最新版を自動取得
 
-## What You Get
+## 動作環境
 
-- A **5h** bar for your current 5-hour Claude usage window
-- A **7d** bar for your current 7-day window
-- Optional Codex usage bars alongside Claude Code
-- A live countdown until each limit resets
-- A small native widget that lives directly in the Windows taskbar
-- System tray icon badges showing your enabled model usage percentage
-- Left-click the tray icon to toggle the taskbar widget on or off
-- Right-click options for refresh, displayed models, update frequency, language, startup, and updates
+- Windows 11
+- Claude Code（CLI またはアプリ）インストール済み・認証済み
+- WSL 環境の Claude Code 認証情報にも対応
 
-## Who This Is For
+## インストール
 
-This app is for Windows users who already have **Claude Code (CLI or App) installed and signed in**.
+[Releases](https://github.com/CodeZeno/Claude-Code-Usage-Monitor/releases) ページから最新の `ai-pulse-hub.exe` をダウンロードして、任意のフォルダに配置してください。
 
-Codex support is optional. To show Codex usage, install and sign in to the Codex CLI, then enable Codex from the right-click **Models** menu.
+## 使い方
 
-It works best if you want a simple "how close am I to the limit?" display that is always visible.
+`ai-pulse-hub.exe` を実行するとタスクバーとトレイに表示されます。
 
-## Requirements
+### タスクトレイ
 
-- Windows 10 or Windows 11
-- Claude Code (CLI or App) installed and authenticated
-- Optional: Codex CLI installed and authenticated, if you want Codex usage
+- トレイアイコンをクリックするとウィジェットの表示・非表示を切り替えられます
+- 右クリックで以下のメニューが開きます
+  - 手動更新（Refresh）
+  - 更新頻度の変更
+  - Windows 起動時の自動実行
+  - 位置のリセット
+  - アップデート確認
+  - 終了
 
-If you use Claude Code through WSL, that is supported too. The monitor can read your Claude Code credentials from Windows or from your WSL environment.
+### タスクバーウィジェット
 
-## Install
+- 左端のディバイダーをドラッグして位置を移動できます
+- 右クリックでトレイと同じメニューが開きます
 
-Install the latest version from WinGet:
+### REST API
 
-```powershell
-winget install CodeZeno.ClaudeCodeUsageMonitor
-```
+ポート `8765` で以下のエンドポイントを提供します。
 
-If you prefer not to use WinGet, you can still download the latest `claude-code-usage-monitor.exe` from the [Releases](https://github.com/CodeZeno/Claude-Code-Usage-Monitor/releases) page and run it directly.
+| メソッド | パス | 概要 |
+|---------|------|------|
+| GET | `/status` | 全モデルの使用量サマリー |
+| GET | `/status/claude` | Claude Code の使用量詳細 |
+| GET | `/health` | サービスの稼働確認 |
 
-## Use
+### 通知
 
-After installing with WinGet, run:
+Claude の 5 時間ウィンドウ使用率が **80 / 90 / 95 / 98%** を超えるとトースト通知が表示されます。通知はウィンドウごとに 1 回のみ発火します。
 
-```powershell
-claude-code-usage-monitor
-```
+## 設定
 
-Once running, it will appear in your taskbar and as one or more tray icons in the notification area.
-
-- Drag the left divider to move the taskbar widget
-- Right-click the taskbar widget or tray icon for refresh, displayed models, update frequency, Start with Windows, reset position, language, updates, and exit
-- Left-click the tray icon to toggle the taskbar widget on or off
-- Enable `Start with Windows` from the right-click menu if you want it to launch automatically when you sign in
-
-### Models
-
-Use the right-click **Models** menu to choose what the widget displays:
-
-- **Claude Code** is enabled by default
-- **Codex** can be enabled alongside Claude Code or shown by itself
-
-When both models are shown, each model has its own usage bar and matching usage text color.
-
-### System Tray Icon
-
-The tray icon shows your current 5-hour usage as a percentage badge.
-
-If both Claude Code and Codex are enabled, the app shows two tray icons: one for Claude Code and one for Codex. If only one model is enabled, it shows one tray icon.
-
-The Claude Code tray icon uses the same warm usage colors as the Claude bar. The Codex tray icon uses a black and white badge style.
-
-Hovering over a tray icon shows the usage values for that model.
-
-## Diagnostics
-
-If you need to troubleshoot startup or visibility issues, run:
-
-```powershell
-claude-code-usage-monitor --diagnose
-```
-
-This writes a log file to:
-
-```text
-%TEMP%\claude-code-usage-monitor.log
-```
-
-Settings are saved to:
+設定は以下のファイルに保存されます。
 
 ```text
 %APPDATA%\ClaudeCodeUsageMonitor\settings.json
 ```
 
-## Account Support
+保存される内容：ウィジェット位置・更新頻度・起動時実行・最終アップデート確認時刻
 
-This app works with the same account types that Claude Code itself supports.
+## プライバシーとセキュリティ
 
-As of **March 19, 2026**, Anthropic's Claude Code setup documentation says:
+本プロジェクトはオープンソースです。コードを確認することで動作を透明に検証できます。
 
-- **Supported:** Pro, Max, Teams, Enterprise, and Console accounts
-- **Not supported:** the free Claude.ai plan
+**読み取る情報：**
 
-If Anthropic changes Claude Code availability in the future, this app should follow whatever Claude Code supports, as long as the usage data remains exposed through the same authenticated endpoints.
+- `~/.claude/.credentials.json` — Claude Code の OAuth 認証情報
+- WSL ディストリビューション内の同等ファイル（必要な場合）
 
-## Privacy And Security
+**ネットワーク送信：**
 
-This project is **open source**, so you can inspect exactly what it does.
+- Anthropic の使用量エンドポイントへのリクエスト（OAuth ベアラートークンを含む）
+- アップデート確認時の Gitea / GitHub へのリクエスト
+- `HTTPS_PROXY` / `HTTP_PROXY` / `ALL_PROXY` が設定されている場合はそのプロキシを経由
 
-What the app reads:
+**ローカル保存のみ（外部送信なし）：**
 
-- Your local Claude Code OAuth credentials from `~/.claude/.credentials.json`
-- If needed, the same credentials file inside an installed WSL distro
-- If Codex is enabled, your local Codex credentials from `$CODEX_HOME/auth.json` or `~/.codex/auth.json`
+- ウィジェット位置・更新頻度・起動設定
 
-What the app sends over the network:
+**行わないこと：**
 
-- Requests to Anthropic's Claude endpoints to read your usage and rate-limit information
-- Requests to ChatGPT's Codex usage endpoint to read your Codex usage and rate-limit information, if Codex is enabled
-- Requests to GitHub only if you use the app's update check / self-update feature
-- If proxy environment variables such as `HTTPS_PROXY`, `HTTP_PROXY`, or `ALL_PROXY` are set, those outbound requests may use that proxy
+- 認証情報を外部サーバーへ送信しない
+- 独自バックエンドサービスを使用しない
+- テレメトリ・分析データを収集しない
+- プロジェクトファイルをアップロードしない
 
-What the app stores locally:
+## ライセンス
 
-- Widget position
-- Polling frequency
-- Language preference
-- Last update check time
-- Displayed model preferences
-
-What it does **not** do:
-
-- It does not send your credentials to any other server
-- It does not use a separate backend service
-- It does not collect analytics or telemetry
-- It does not upload your project files
-- It does not directly edit your Codex credentials file
-
-Notes:
-
-- If your Claude Code token is expired, the app may ask the local Claude CLI to refresh it in the background
-- If your Codex token is expired, the app may ask the local Codex CLI to refresh it in the background. The monitor does not write `auth.json` itself; any credential update is handled by the Codex CLI.
-- Portable installs can update themselves by downloading the latest release from this repository
-- Proxies should be trusted because proxied usage requests include your OAuth bearer token inside the TLS connection
-
-## How It Works
-
-The monitor:
-
-1. Finds your enabled model login credentials
-2. Reads your current usage from Anthropic and/or ChatGPT
-3. Shows the result directly in the Windows taskbar
-4. Refreshes periodically in the background
-
-If the newer usage endpoint is unavailable, it can fall back to reading the rate-limit headers returned by Claude's Messages API.
-
-## Open Source
-
-This project is licensed under MIT.
-
-If you want to inspect the behavior or audit the code, everything is in this repository.
+MIT
