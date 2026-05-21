@@ -39,17 +39,11 @@ WSL 経由で Claude Code を使用している場合も対応しています。
 
 ## インストール
 
-WinGet で最新バージョンをインストールします：
-
-```powershell
-winget install CodeZeno.ClaudeCodeUsageMonitor
-```
-
-WinGet を使わない場合は、[Releases](https://github.com/CodeZeno/Claude-Code-Usage-Monitor/releases) ページから最新の `ai-usage-monitor.exe` をダウンロードして直接実行することもできます。
+[Releases](https://github.com/youfuku-sg/Ai-Usage-Monitor/releases) ページから最新の `ai-usage-monitor.exe` をダウンロードして直接実行します。
 
 ## 使い方
 
-WinGet でインストールした後、以下のコマンドで起動します：
+ダウンロードした `ai-usage-monitor.exe` を実行します。または任意のディレクトリに配置して以下のコマンドでも起動できます：
 
 ```powershell
 ai-usage-monitor
