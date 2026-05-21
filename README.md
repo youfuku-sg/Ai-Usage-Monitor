@@ -1,7 +1,7 @@
 ![Windows](https://img.shields.io/badge/platform-Windows-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# AiPulseHub
+# Ai-Usage-Monitor
 
 Claude Code の使用量をバックグラウンドで収集し、REST API・トースト通知・タスクバーウィジェットで提供するローカルハブ。
 
