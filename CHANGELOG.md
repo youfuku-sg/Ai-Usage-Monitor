@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.0.7] - 2026-05-21
+
+### Fixed
+- MSI 更新スレッドで HWND を直接 move していたコンパイルエラーを修正（SendHwnd ラッパーを使用）
+
 ## [0.0.6] - 2026-05-21
 
 ### Changed
