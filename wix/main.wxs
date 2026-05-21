@@ -29,7 +29,7 @@
         <Directory Id='TARGETDIR' Name='SourceDir'>
             <Directory Id='LocalAppDataFolder'>
                 <Directory Id='APPLICATIONFOLDER' Name='AiUsageMonitor'>
-                    <Component Id='binary0' Guid='*'>
+                    <Component Id='binary0' Guid='AA90DAF9-E342-40FD-80A6-3AAFBFD77769'>
                         <File
                             Id='exe0'
                             Name='ai-usage-monitor.exe'
