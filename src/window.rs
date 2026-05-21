@@ -1389,7 +1389,7 @@ fn paint_content(
             row_y,
             is_dark,
             text_color,
-            strings.session_window,
+            strings.claude_label,
             session_pct,
             session_text,
             codex_session_pct,
