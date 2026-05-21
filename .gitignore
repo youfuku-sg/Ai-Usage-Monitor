@@ -24,10 +24,3 @@ workflow.cmd
 
 # Local WinGet manifest generation output
 /manifests/
-
-# Gitea 専用ディレクトリ（gitea-private ブランチで管理）
-/docs/
-/openspec/
-/.claude/
-/.devcontainer/
-/.gitea/
