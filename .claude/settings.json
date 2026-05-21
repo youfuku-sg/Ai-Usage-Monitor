@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "PowerShell(*)",
+      "Edit(*)",
+      "Write(*)",
+      "Read(*)",
+      "Glob(*)",
+      "Grep(*)",
+      "WebFetch(*)",
+      "WebSearch(*)",
+      "mcp__chrome-devtools__*",
+      "mcp__chrome-devtools__take_screenshot",
+      "Agent(*)",
+      "TodoWrite(*)",
+      "TodoRead(*)"
+    ]
+  }
+}

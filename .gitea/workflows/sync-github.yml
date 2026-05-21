@@ -1,0 +1,28 @@
+name: Sync to GitHub
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        run: |
+          git init .
+          git remote add origin "http://192.168.4.135:3000/${{ github.repository }}.git"
+          git config http.extraHeader "Authorization: token ${{ github.token }}"
+          git fetch origin
+          git checkout FETCH_HEAD
+
+      - name: Push to GitHub
+        env:
+          MIRROR_TOKEN: ${{ secrets.MIRROR_TOKEN }}
+          MIRROR_REPO_URL: ${{ secrets.MIRROR_REPO_URL }}
+        run: |
+          git push --force \
+            "https://x-access-token:${MIRROR_TOKEN}@${MIRROR_REPO_URL}" \
+            "HEAD:${{ github.ref_name }}"

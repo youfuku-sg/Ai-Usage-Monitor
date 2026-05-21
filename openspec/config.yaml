@@ -1,0 +1,85 @@
+schema: spec-driven
+
+context: |
+  ## プロジェクト: AiPulseHub
+
+  Windows 11 上でバックグラウンド常駐するローカルハブアプリケーション。
+  Claude Code の使用量を収集・集約し、API配信・トースト通知・タスクトレイ表示を行う。
+
+  ## テクノロジースタック
+
+  - 言語: Rust（edition 2021）
+  - Win32 API: `windows` クレート 0.58（トレイ・通知・ウィンドウ管理）
+  - 非同期: Tokio（axum 用。専用スレッドで Runtime を起動）
+  - HTTP サーバー: axum 0.8.x（REST API、ポート 8765）
+  - HTTP クライアント: ureq 2.x（OAuth API 呼び出し）
+  - シリアライズ: serde / serde_json
+  - 設定ファイル: TOML（`config.toml`）
+  - TLS: native-tls
+
+  ## ディレクトリ構成
+
+  ```
+  src/
+    main.rs              # エントリポイント
+    config.rs            # config.toml 読み込み
+    state.rs             # AppState / SharedState (Arc<RwLock<AppState>>)
+    collectors/
+      claude.rs          # OAuth API + JSONL フォールバック
+    api/
+      server.rs          # axum ルーター
+    notifier.rs          # 閾値チェック・通知送出
+    tray_icon.rs         # Win32 トレイアイコン
+    window.rs            # Win32 メッセージループ
+    native_interop.rs    # Win32 ユーティリティ
+    models.rs            # 型定義
+    updater.rs           # 自動アップデーター
+    diagnose.rs          # ログ出力
+  ```
+
+  ## スレッドモデル
+
+  - メインスレッド: Win32 メッセージループ（window::run()）
+  - コレクタースレッド: 30秒ごとに claude.rs をポーリング
+  - Tokio スレッド: axum HTTP サーバー（ポート 8765）
+  - 共有状態: Arc<RwLock<AppState>>
+
+  ## データ収集
+
+  - プライマリ: Anthropic OAuth API（`~/.claude/.credentials.json` のトークンを使用）
+  - フォールバック: ローカル JSONL パース（`~/.claude/projects/**/*.jsonl`）
+  - WSL 上の認証情報も順に探索する
+  - 収集対象: 5時間ウィンドウのみ（7日ウィンドウは対象外）
+
+  ## 通知
+
+  - Win32 バルーン通知（Shell_NotifyIconW）
+  - 使用率が 80 / 90 / 95 / 98% に達した時点で通知
+  - 同一ウィンドウ内で各閾値につき1回のみ
+
+  ## リポジトリ運用
+
+  - Gitea: 全データ保管庫（コード・ドキュメント・全ファイル）
+  - GitHub: CI/CD・リリース専用（docs/ は含めない）
+  - ブランチ戦略: Git Flow（main / develop / feature/* / release/* / hotfix/*）
+  - コミット規則: Conventional Commits（feat: / fix: / chore: / docs: / refactor: / test:）
+  - バージョン管理: Cargo.toml の version フィールドを唯一の正とする
+
+  ## 変更管理
+
+  - 改修内容は openspec で管理（/opsx:propose → /opsx:apply → /opsx:archive）
+  - 実装は feature ブランチで行い、develop へ PR マージ
+
+rules:
+  proposal:
+    - 変更の目的・背景・スコープを明確に記述すること
+    - Non-goals（やらないこと）を必ず記載すること
+    - 既存コードへの影響範囲を示すこと
+  design:
+    - 既存のスレッドモデル・SharedState の構造に沿った設計にすること
+    - Win32 固有の処理は tray_icon.rs / native_interop.rs に閉じ込めること
+    - 新しいクレートを追加する場合は理由を明記すること
+  tasks:
+    - タスクは1つのコミットに収まる粒度に分割すること
+    - 各タスクに対象ファイルを明記すること
+    - テストが必要な場合はタスクに含めること
