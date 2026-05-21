@@ -35,7 +35,6 @@ pub type CredentialWatchSnapshot = Vec<String>;
 #[derive(Deserialize)]
 struct UsageResponse {
     five_hour: Option<UsageBucket>,
-    seven_day: Option<UsageBucket>,
 }
 
 #[derive(Deserialize)]
@@ -494,15 +493,12 @@ fn fetch_usage_with_fallback(token: &str) -> Result<UsageData, PollError> {
     // Try the dedicated usage endpoint first
     match try_usage_endpoint(token)? {
         Some(data) => {
-            // If reset timers are missing, fill them in from the Messages API
-            if data.session.resets_at.is_none() || data.weekly.resets_at.is_none() {
+            // If reset timer is missing, fill it in from the Messages API
+            if data.session.resets_at.is_none() {
                 if let Ok(fallback) = fetch_usage_via_messages(token) {
                     let mut merged = data;
                     if merged.session.resets_at.is_none() {
                         merged.session.resets_at = fallback.session.resets_at;
-                    }
-                    if merged.weekly.resets_at.is_none() {
-                        merged.weekly.resets_at = fallback.weekly.resets_at;
                     }
                     return Ok(merged);
                 }
@@ -550,11 +546,6 @@ fn try_usage_endpoint(token: &str) -> Result<Option<UsageData>, PollError> {
         data.session.resets_at = parse_iso8601(bucket.resets_at.as_deref());
     }
 
-    if let Some(bucket) = &response.seven_day {
-        data.weekly.percentage = bucket.utilization;
-        data.weekly.resets_at = parse_iso8601(bucket.resets_at.as_deref());
-    }
-
     Ok(Some(data))
 }
 
@@ -587,10 +578,9 @@ fn fetch_usage_via_messages(token: &str) -> Result<UsageData, PollError> {
         };
 
         let h5 = response.header("anthropic-ratelimit-unified-5h-utilization");
-        let h7 = response.header("anthropic-ratelimit-unified-7d-utilization");
         let hs = response.header("anthropic-ratelimit-unified-status");
 
-        if h5.is_some() || h7.is_some() || hs.is_some() {
+        if h5.is_some() || hs.is_some() {
             return Ok(parse_rate_limit_headers(&response));
         }
     }
@@ -608,23 +598,14 @@ fn parse_rate_limit_headers(response: &ureq::Response) -> UsageData {
         "anthropic-ratelimit-unified-5h-reset",
     ));
 
-    data.weekly.percentage =
-        get_header_f64(response, "anthropic-ratelimit-unified-7d-utilization") * 100.0;
-    data.weekly.resets_at = unix_to_system_time(get_header_i64(
-        response,
-        "anthropic-ratelimit-unified-7d-reset",
-    ));
-
     let overall_reset = get_header_i64(response, "anthropic-ratelimit-unified-reset");
 
-    if data.session.percentage == 0.0 && data.weekly.percentage == 0.0 {
+    if data.session.percentage == 0.0 {
         let status = response.header("anthropic-ratelimit-unified-status");
         if status == Some("rejected") {
             let claim = response.header("anthropic-ratelimit-unified-representative-claim");
-            match claim {
-                Some("five_hour") => data.session.percentage = 100.0,
-                Some("seven_day") => data.weekly.percentage = 100.0,
-                _ => {}
+            if claim == Some("five_hour") {
+                data.session.percentage = 100.0;
             }
         }
 
@@ -678,10 +659,6 @@ fn codex_usage_from_response(response: CodexUsageResponse) -> Option<UsageData> 
 
     if let Some(window) = details.primary_window.flatten() {
         data.session = codex_section_from_window(&window);
-    }
-
-    if let Some(window) = details.secondary_window.flatten() {
-        data.weekly = codex_section_from_window(&window);
     }
 
     Some(data)
@@ -1090,7 +1067,7 @@ fn time_until_display_change_from_secs(total_secs: u64) -> Duration {
 pub fn is_past_reset(data: &UsageData) -> bool {
     let now = SystemTime::now();
     let past = |s: &UsageSection| matches!(s.resets_at, Some(t) if now.duration_since(t).is_ok());
-    past(&data.session) || past(&data.weekly)
+    past(&data.session)
 }
 
 pub fn app_is_past_reset(data: &AppUsageData) -> bool {

@@ -57,12 +57,8 @@ struct AppState {
 
     session_percent: f64,
     session_text: String,
-    weekly_percent: f64,
-    weekly_text: String,
     codex_session_percent: f64,
     codex_session_text: String,
-    codex_weekly_percent: f64,
-    codex_weekly_text: String,
     show_claude_code: bool,
     show_codex: bool,
 
@@ -294,10 +290,9 @@ fn tray_icon_data_from_state() -> Vec<tray_icon::TrayIconData> {
                     kind: tray_icon::TrayIconKind::Claude,
                     percent: Some(s.session_percent),
                     tooltip: format!(
-                        "{} 5h: {} | 7d: {}",
+                        "{} 5h: {}",
                         s.language.strings().claude_code_model,
-                        s.session_text,
-                        s.weekly_text
+                        s.session_text
                     ),
                 });
             }
@@ -306,10 +301,9 @@ fn tray_icon_data_from_state() -> Vec<tray_icon::TrayIconData> {
                     kind: tray_icon::TrayIconKind::Codex,
                     percent: Some(s.codex_session_percent),
                     tooltip: format!(
-                        "{} 5h: {} | 7d: {}",
+                        "{} 5h: {}",
                         s.language.strings().codex_model,
-                        s.codex_session_text,
-                        s.codex_weekly_text
+                        s.codex_session_text
                     ),
                 });
             }
@@ -419,18 +413,14 @@ fn refresh_usage_texts(state: &mut AppState) {
 
     if let Some(claude_code) = data.claude_code.as_ref() {
         state.session_text = poller::format_line(&claude_code.session, strings);
-        state.weekly_text = poller::format_line(&claude_code.weekly, strings);
     } else if state.show_claude_code {
         state.session_text = "!".to_string();
-        state.weekly_text = "!".to_string();
     }
 
     if let Some(codex) = data.codex.as_ref() {
         state.codex_session_text = poller::format_line(&codex.session, strings);
-        state.codex_weekly_text = poller::format_line(&codex.weekly, strings);
     } else if state.show_codex {
         state.codex_session_text = "!".to_string();
-        state.codex_weekly_text = "!".to_string();
     }
 }
 
@@ -1026,12 +1016,8 @@ pub fn run() {
                 install_channel,
                 session_percent: 0.0,
                 session_text: "--".to_string(),
-                weekly_percent: 0.0,
-                weekly_text: "--".to_string(),
                 codex_session_percent: 0.0,
                 codex_session_text: "--".to_string(),
-                codex_weekly_percent: 0.0,
-                codex_weekly_text: "--".to_string(),
                 show_claude_code: settings.show_claude_code,
                 show_codex: settings.show_codex,
                 data: None,
@@ -1165,12 +1151,8 @@ fn render_layered() {
         strings,
         session_pct,
         session_text,
-        weekly_pct,
-        weekly_text,
         codex_session_pct,
         codex_session_text,
-        codex_weekly_pct,
-        codex_weekly_text,
         show_claude_code,
         show_codex,
     ) = {
@@ -1183,12 +1165,8 @@ fn render_layered() {
                 s.language.strings(),
                 s.session_percent,
                 s.session_text.clone(),
-                s.weekly_percent,
-                s.weekly_text.clone(),
                 s.codex_session_percent,
                 s.codex_session_text.clone(),
-                s.codex_weekly_percent,
-                s.codex_weekly_text.clone(),
                 s.show_claude_code,
                 s.show_codex,
             ),
@@ -1272,12 +1250,8 @@ fn render_layered() {
             strings,
             session_pct,
             &session_text,
-            weekly_pct,
-            &weekly_text,
             codex_session_pct,
             &codex_session_text,
-            codex_weekly_pct,
-            &codex_weekly_text,
             show_claude_code,
             show_codex,
             &codex_accent,
@@ -1342,12 +1316,8 @@ fn paint_content(
     strings: Strings,
     session_pct: f64,
     session_text: &str,
-    weekly_pct: f64,
-    weekly_text: &str,
     codex_session_pct: f64,
     codex_session_text: &str,
-    codex_weekly_pct: f64,
-    codex_weekly_text: &str,
     show_claude_code: bool,
     show_codex: bool,
     codex_accent: &Color,
@@ -1402,8 +1372,7 @@ fn paint_content(
         let _ = DeleteObject(right_brush);
 
         let content_x = sc(LEFT_DIVIDER_W) + sc(DIVIDER_RIGHT_MARGIN);
-        let row2_y = height - sc(5) - sc(SEGMENT_H);
-        let row1_y = row2_y - sc(10) - sc(SEGMENT_H);
+        let row_y = (height - sc(SEGMENT_H)) / 2;
 
         let _ = SetBkMode(hdc, TRANSPARENT);
         let _ = SetTextColor(hdc, COLORREF(text_color.to_colorref()));
@@ -1430,7 +1399,7 @@ fn paint_content(
         draw_row(
             hdc,
             content_x,
-            row1_y,
+            row_y,
             is_dark,
             text_color,
             strings.session_window,
@@ -1438,23 +1407,6 @@ fn paint_content(
             session_text,
             codex_session_pct,
             codex_session_text,
-            show_claude_code,
-            show_codex,
-            accent,
-            codex_accent,
-            track,
-        );
-        draw_row(
-            hdc,
-            content_x,
-            row2_y,
-            is_dark,
-            text_color,
-            strings.weekly_window,
-            weekly_pct,
-            weekly_text,
-            codex_weekly_pct,
-            codex_weekly_text,
             show_claude_code,
             show_codex,
             accent,
@@ -1483,17 +1435,13 @@ fn do_poll(send_hwnd: SendHwnd) {
             if let Some(s) = state.as_mut() {
                 if let Some(claude_code) = data.claude_code.as_ref() {
                     s.session_percent = claude_code.session.percentage;
-                    s.weekly_percent = claude_code.weekly.percentage;
                 } else if s.show_claude_code {
                     s.session_percent = 0.0;
-                    s.weekly_percent = 0.0;
                 }
                 if let Some(codex) = data.codex.as_ref() {
                     s.codex_session_percent = codex.session.percentage;
-                    s.codex_weekly_percent = codex.weekly.percentage;
                 } else if s.show_codex {
                     s.codex_session_percent = 0.0;
-                    s.codex_weekly_percent = 0.0;
                 }
                 // Stop fast-poll if reset data is now fresh
                 if !poller::app_is_past_reset(&data) {
@@ -1553,9 +1501,7 @@ fn do_poll(send_hwnd: SendHwnd) {
                             s.auth_watch_mode = watch_mode;
                             s.auth_watch_snapshot = watch_snapshot;
                             s.session_text = "!".to_string();
-                            s.weekly_text = "!".to_string();
                             s.codex_session_text = "!".to_string();
-                            s.codex_weekly_text = "!".to_string();
                             s.retry_count = s.retry_count.saturating_add(1);
                             unsafe {
                                 let _ = KillTimer(hwnd, TIMER_POLL);
@@ -2670,12 +2616,8 @@ fn paint(hdc: HDC, hwnd: HWND) {
             strings,
             session_pct,
             &session_text,
-            weekly_pct,
-            &weekly_text,
             codex_session_pct,
             &codex_session_text,
-            codex_weekly_pct,
-            &codex_weekly_text,
             show_claude_code,
             show_codex,
             &codex_accent,
