@@ -1,7 +1,7 @@
 ![Windows](https://img.shields.io/badge/platform-Windows-blue)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-# Claude Code Usage Monitor
+# Ai-Usage-Monitor
 
 ![Screenshot](.github/animation.gif)
 
@@ -44,14 +44,14 @@ WinGet で最新バージョンをインストールします：
 winget install CodeZeno.ClaudeCodeUsageMonitor
 ```
 
-WinGet を使わない場合は、[Releases](https://github.com/CodeZeno/Claude-Code-Usage-Monitor/releases) ページから最新の `claude-code-usage-monitor.exe` をダウンロードして直接実行することもできます。
+WinGet を使わない場合は、[Releases](https://github.com/CodeZeno/Claude-Code-Usage-Monitor/releases) ページから最新の `ai-usage-monitor.exe` をダウンロードして直接実行することもできます。
 
 ## 使い方
 
 WinGet でインストールした後、以下のコマンドで起動します：
 
 ```powershell
-claude-code-usage-monitor
+ai-usage-monitor
 ```
 
 起動するとタスクバーとシステムトレイに表示されます。
@@ -85,13 +85,13 @@ Claude Code のトレイアイコンは Claude バーと同じウォームカラ
 起動や表示の問題をトラブルシュートする場合は以下を実行します：
 
 ```powershell
-claude-code-usage-monitor --diagnose
+ai-usage-monitor --diagnose
 ```
 
 ログファイルは以下に書き込まれます：
 
 ```text
-%TEMP%\claude-code-usage-monitor.log
+%TEMP%\ai-usage-monitor.log
 ```
 
 設定は以下に保存されます：
