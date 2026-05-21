@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.1.3] - 2026-05-21
+
+### Changed
+- リセット時刻の表示をカウントダウンから実時刻（HH:MM）形式に変更（例: `40% · 15:30`）
+
 ## [0.1.2] - 2026-05-21
 
 ### Changed

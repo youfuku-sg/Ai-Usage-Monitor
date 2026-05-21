@@ -998,35 +998,59 @@ fn is_leap(y: u64) -> bool {
 }
 
 /// Format a usage section as "X% · Yh" style text
-pub fn format_line(section: &UsageSection, strings: Strings) -> String {
+pub fn format_line(section: &UsageSection, _strings: Strings) -> String {
     let pct = format!("{:.0}%", section.percentage);
-    let cd = format_countdown(section.resets_at, strings);
-    if cd.is_empty() {
+    let time = format_reset_hhmm(section.resets_at);
+    if time.is_empty() {
         pct
     } else {
-        format!("{pct} \u{00b7} {cd}")
+        format!("{pct} \u{00b7} {time}")
     }
 }
 
-fn format_countdown(resets_at: Option<SystemTime>, strings: Strings) -> String {
+fn format_reset_hhmm(resets_at: Option<SystemTime>) -> String {
     let reset = match resets_at {
         Some(t) => t,
         None => return String::new(),
     };
 
-    let remaining = match reset.duration_since(SystemTime::now()) {
-        Ok(d) => d,
-        Err(_) => return strings.now.to_string(),
+    if SystemTime::now().duration_since(reset).is_ok() {
+        return "--:--".to_string();
+    }
+
+    let unix_secs = match reset.duration_since(std::time::UNIX_EPOCH) {
+        Ok(d) => d.as_secs() as i64,
+        Err(_) => return String::new(),
     };
 
-    format_countdown_from_secs(remaining.as_secs(), strings)
+    let local_secs = unix_secs + utc_offset_secs();
+    let total_mins = local_secs.rem_euclid(86400) as u32 / 60;
+    format!("{:02}:{:02}", total_mins / 60, total_mins % 60)
 }
 
-/// Calculate how long until the display text would change
+fn utc_offset_secs() -> i64 {
+    use windows::Win32::System::Time::{
+        GetTimeZoneInformation, TIME_ZONE_ID_DAYLIGHT, TIME_ZONE_ID_STANDARD,
+        TIME_ZONE_INFORMATION,
+    };
+    unsafe {
+        let mut tz = TIME_ZONE_INFORMATION::default();
+        let id = GetTimeZoneInformation(&mut tz);
+        let extra = match id {
+            TIME_ZONE_ID_STANDARD => tz.StandardBias,
+            TIME_ZONE_ID_DAYLIGHT => tz.DaylightBias,
+            _ => 0,
+        };
+        -((tz.Bias + extra) as i64) * 60
+    }
+}
+
+/// Calculate how long until the display text would change (HH:MM changes every minute)
 pub fn time_until_display_change(resets_at: Option<SystemTime>) -> Option<Duration> {
     let reset = resets_at?;
     let remaining = reset.duration_since(SystemTime::now()).ok()?;
-    Some(time_until_display_change_from_secs(remaining.as_secs()))
+    let secs_in_current_minute = remaining.as_secs() % 60;
+    Some(Duration::from_secs(secs_in_current_minute + 1))
 }
 
 fn format_countdown_from_secs(total_secs: u64, strings: Strings) -> String {
