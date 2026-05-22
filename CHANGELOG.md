@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.1.5] - 2026-05-22
+
+### Added
+- ウィジェット2行目に Codex の使用率を表示（`codex: 30% · 18:45`）
+- Codex が未契約・未認証の場合は2行目を非表示
+- ポーリングのたびに Codex の可用性を再判定（再起動不要）
+
 ## [0.1.4] - 2026-05-21
 
 ### Fixed

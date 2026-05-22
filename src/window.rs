@@ -59,6 +59,7 @@ struct AppState {
     session_text: String,
     codex_session_percent: f64,
     codex_session_text: String,
+    codex_available: bool,
     show_claude_code: bool,
     show_codex: bool,
 
@@ -1005,6 +1006,7 @@ pub fn run() {
                 session_text: "--".to_string(),
                 codex_session_percent: 0.0,
                 codex_session_text: "--".to_string(),
+                codex_available: false,
                 show_claude_code: settings.show_claude_code,
                 show_codex: settings.show_codex,
                 data: None,
@@ -1142,6 +1144,7 @@ fn render_layered() {
         codex_session_text,
         show_claude_code,
         show_codex,
+        codex_available,
     ) = {
         let state = lock_state();
         match state.as_ref() {
@@ -1156,6 +1159,7 @@ fn render_layered() {
                 s.codex_session_text.clone(),
                 s.show_claude_code,
                 s.show_codex,
+                s.codex_available,
             ),
             None => return,
         }
@@ -1241,6 +1245,7 @@ fn render_layered() {
             &codex_session_text,
             show_claude_code,
             show_codex,
+            codex_available,
             &codex_accent,
         );
 
@@ -1307,6 +1312,7 @@ fn paint_content(
     codex_session_text: &str,
     show_claude_code: bool,
     show_codex: bool,
+    codex_available: bool,
     codex_accent: &Color,
 ) {
     unsafe {
@@ -1359,7 +1365,15 @@ fn paint_content(
         let _ = DeleteObject(right_brush);
 
         let content_x = sc(LEFT_DIVIDER_W) + sc(DIVIDER_RIGHT_MARGIN);
-        let row_y = (height - sc(SEGMENT_H)) / 2;
+        let show_codex_row = show_codex && codex_available;
+        let row_gap = sc(10);
+        let total_rows_h = if show_codex_row {
+            sc(SEGMENT_H) * 2 + row_gap
+        } else {
+            sc(SEGMENT_H)
+        };
+        let row1_y = (height - total_rows_h) / 2;
+        let row2_y = row1_y + sc(SEGMENT_H) + row_gap;
 
         let _ = SetBkMode(hdc, TRANSPARENT);
         let _ = SetTextColor(hdc, COLORREF(text_color.to_colorref()));
@@ -1383,23 +1397,44 @@ fn paint_content(
         );
         let old_font = SelectObject(hdc, font);
 
-        draw_row(
-            hdc,
-            content_x,
-            row_y,
-            is_dark,
-            text_color,
-            strings.claude_label,
-            session_pct,
-            session_text,
-            codex_session_pct,
-            codex_session_text,
-            show_claude_code,
-            show_codex,
-            accent,
-            codex_accent,
-            track,
-        );
+        if show_claude_code {
+            draw_row(
+                hdc,
+                content_x,
+                row1_y,
+                is_dark,
+                text_color,
+                strings.claude_label,
+                session_pct,
+                session_text,
+                0.0,
+                "",
+                true,
+                false,
+                accent,
+                codex_accent,
+                track,
+            );
+        }
+        if show_codex_row {
+            draw_row(
+                hdc,
+                content_x,
+                row2_y,
+                is_dark,
+                text_color,
+                strings.codex_label,
+                0.0,
+                "",
+                codex_session_pct,
+                codex_session_text,
+                false,
+                true,
+                accent,
+                codex_accent,
+                track,
+            );
+        }
 
         SelectObject(hdc, old_font);
         let _ = DeleteObject(font);
@@ -1425,6 +1460,7 @@ fn do_poll(send_hwnd: SendHwnd) {
                 } else if s.show_claude_code {
                     s.session_percent = 0.0;
                 }
+                s.codex_available = data.codex.is_some();
                 if let Some(codex) = data.codex.as_ref() {
                     s.codex_session_percent = codex.session.percentage;
                 } else if s.show_codex {
@@ -2522,6 +2558,7 @@ fn paint(hdc: HDC, hwnd: HWND) {
         codex_session_text,
         show_claude_code,
         show_codex,
+        codex_available,
     ) = {
         let state = lock_state();
         match state.as_ref() {
@@ -2534,6 +2571,7 @@ fn paint(hdc: HDC, hwnd: HWND) {
                 s.codex_session_text.clone(),
                 s.show_claude_code,
                 s.show_codex,
+                s.codex_available,
             ),
             None => return,
         }
@@ -2587,6 +2625,7 @@ fn paint(hdc: HDC, hwnd: HWND) {
             &codex_session_text,
             show_claude_code,
             show_codex,
+            codex_available,
             &codex_accent,
         );
 
