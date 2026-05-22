@@ -33,6 +33,7 @@ pub(super) const STRINGS: Strings = Strings {
     show_widget: "ウィジェットを表示",
     session_window: "5h",
     claude_label: "claude:",
+    codex_label: "codex:",
     now: "今",
     day_suffix: "日",
     hour_suffix: "時間",
