@@ -33,6 +33,7 @@ pub(super) const STRINGS: Strings = Strings {
     show_widget: "顯示小工具",
     session_window: "5h",
     claude_label: "claude:",
+    codex_label: "codex:",
     now: "現在",
     day_suffix: "天",
     hour_suffix: "時",
