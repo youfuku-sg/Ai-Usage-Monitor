@@ -37,6 +37,23 @@ Codex 対応はオプションです。Codex の使用量を表示するには�
 
 WSL 経由で Claude Code を使用している場合も対応しています。Windows または WSL 環境の Claude Code 認証情報を読み取れます。
 
+## 前提条件
+
+**Windows 上で Claude Code をインストール・認証していること**が必須です。WSL 上のみで認証している場合、認証情報の読み取りに失敗してデータを取得できません。
+
+まだインストールしていない場合は、PowerShell で以下を実行してください：
+
+```powershell
+winget install Anthropic.ClaudeCode
+claude update
+claude --version
+claude
+```
+
+最後の `claude` を実行すると認証フローが起動します。ブラウザで Anthropic アカウントへのサインインが完了すれば準備は完了です。
+
+> WSL 経由で Claude Code を使用している場合も、**Windows 側の認証情報が存在すれば** WSL の認証情報も合わせて読み取ります。Windows 側の認証を先に済ませてください。
+
 ## インストール
 
 **インストーラー版（推奨）**
