@@ -24,6 +24,7 @@ use crate::native_interop::{
     WM_APP_USAGE_UPDATED,
 };
 use crate::poller;
+use crate::state::SharedState;
 use crate::theme;
 use crate::tray_icon;
 use crate::updater::{self, InstallChannel, ReleaseDescriptor, UpdateCheckResult};
@@ -181,10 +182,32 @@ fn load_embedded_app_icons() -> (HICON, HICON) {
 unsafe impl Send for AppState {}
 
 static STATE: Mutex<Option<AppState>> = Mutex::new(None);
+static SHARED_USAGE_STATE: Mutex<Option<SharedState>> = Mutex::new(None);
 
 /// Lock STATE safely, recovering from poisoned mutex
 fn lock_state() -> MutexGuard<'static, Option<AppState>> {
     STATE.lock().unwrap_or_else(|e| e.into_inner())
+}
+
+fn lock_shared_usage_state() -> MutexGuard<'static, Option<SharedState>> {
+    SHARED_USAGE_STATE.lock().unwrap_or_else(|e| e.into_inner())
+}
+
+fn store_shared_usage_state(shared_state: SharedState) {
+    let mut state = lock_shared_usage_state();
+    *state = Some(shared_state);
+}
+
+fn shared_usage_state() -> Option<SharedState> {
+    let state = lock_shared_usage_state();
+    state.clone()
+}
+
+fn spawn_poll(send_hwnd: SendHwnd) {
+    let shared_state = shared_usage_state();
+    std::thread::spawn(move || {
+        do_poll(send_hwnd, shared_state);
+    });
 }
 
 fn settings_path() -> PathBuf {
@@ -889,13 +912,14 @@ fn codex_usage_text_color(is_dark: bool) -> Color {
     }
 }
 
-pub fn run() {
+pub fn run(shared_state: SharedState) {
     // Enable Per-Monitor DPI Awareness V2 for crisp rendering at any scale factor
     unsafe {
         let _ = SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
         CURRENT_DPI.store(GetDpiForSystem(), Ordering::Relaxed);
     }
     diagnose::log("window::run started");
+    store_shared_usage_state(shared_state);
 
     // Single-instance guard: silently exit if another instance is running
     let mutex_name = native_interop::wide_str("Global\\ClaudeCodeUsageMonitor");
@@ -1098,11 +1122,9 @@ pub fn run() {
         SetTimer(hwnd, TIMER_POLL, initial_poll_ms, None);
 
         // Initial poll
+        diagnose::log("initial poll thread started");
         let send_hwnd = SendHwnd::from_hwnd(hwnd);
-        std::thread::spawn(move || {
-            diagnose::log("initial poll thread started");
-            do_poll(send_hwnd);
-        });
+        spawn_poll(send_hwnd);
 
         schedule_auto_update_check(hwnd);
         let should_check_updates = {
@@ -1441,7 +1463,7 @@ fn paint_content(
     }
 }
 
-fn do_poll(send_hwnd: SendHwnd) {
+fn do_poll(send_hwnd: SendHwnd, shared_state: Option<SharedState>) {
     let hwnd = send_hwnd.to_hwnd();
     let (show_claude_code, show_codex) = {
         let state = lock_state();
@@ -1452,7 +1474,8 @@ fn do_poll(send_hwnd: SendHwnd) {
     };
 
     match poller::poll(show_claude_code, show_codex) {
-        Ok(data) => {
+        Ok(mut data) => {
+            data.polled_at = crate::models::current_utc_timestamp();
             let mut state = lock_state();
             if let Some(s) = state.as_mut() {
                 if let Some(claude_code) = data.claude_code.as_ref() {
@@ -1476,6 +1499,12 @@ fn do_poll(send_hwnd: SendHwnd) {
                 s.data = Some(data);
                 s.last_poll_ok = true;
                 refresh_usage_texts(s);
+
+                if let Some(shared_state) = shared_state.as_ref() {
+                    if let Ok(mut writer) = shared_state.write() {
+                        *writer = s.data.clone();
+                    }
+                }
 
                 // Recovered from errors — restore normal poll interval
                 if s.retry_count > 0 {
@@ -1890,16 +1919,12 @@ unsafe extern "system" fn wnd_proc(
                                 }
                                 drop(state);
                                 let sh = SendHwnd::from_hwnd(hwnd);
-                                std::thread::spawn(move || {
-                                    do_poll(sh);
-                                });
+                                spawn_poll(sh);
                             }
                         }
                         Some((false, _, _)) => {
                             let sh = SendHwnd::from_hwnd(hwnd);
-                            std::thread::spawn(move || {
-                                do_poll(sh);
-                            });
+                            spawn_poll(sh);
                         }
                         None => {}
                     }
@@ -1919,9 +1944,7 @@ unsafe extern "system" fn wnd_proc(
                     };
                     if should_poll {
                         let sh = SendHwnd::from_hwnd(hwnd);
-                        std::thread::spawn(move || {
-                            do_poll(sh);
-                        });
+                        spawn_poll(sh);
                     }
                 }
                 TIMER_UPDATE_CHECK => {
@@ -2121,9 +2144,7 @@ unsafe extern "system" fn wnd_proc(
                     }
                     render_layered();
                     let sh = SendHwnd::from_hwnd(hwnd);
-                    std::thread::spawn(move || {
-                        do_poll(sh);
-                    });
+                    spawn_poll(sh);
                 }
                 IDM_VERSION_ACTION => {
                     let (install_channel, release) = {
@@ -2231,9 +2252,7 @@ unsafe extern "system" fn wnd_proc(
                     render_layered();
                     sync_tray_icons(hwnd);
                     let sh = SendHwnd::from_hwnd(hwnd);
-                    std::thread::spawn(move || {
-                        do_poll(sh);
-                    });
+                    spawn_poll(sh);
                 }
                 IDM_LANG_SYSTEM
                 | IDM_LANG_ENGLISH

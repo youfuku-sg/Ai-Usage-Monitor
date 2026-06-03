@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/ja/1.1.0/).
 
+## [0.1.7] - 2026-06-03
+
+### Added
+- localhost の `GET /usage` で Claude Code / Codex の最新使用量を JSON 取得できる HTTP API を追加
+- `%APPDATA%\\ClaudeCodeUsageMonitor\\config.toml` で HTTP API の有効/無効とポート番号を設定可能にした
+
 ## [0.1.6] - 2026-05-25
 
 ### Changed
